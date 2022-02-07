@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "github.com/castaneai/grpc.castaneai.dev/proto";
+
+service EchoService {
+  rpc StreamingEcho(stream StreamingEchoRequest) returns (stream StreamingEchoResponse) {}
+}
+
+message StreamingEchoRequest {
+  string message = 1;
+}
+
+message StreamingEchoResponse {
+  string message = 2;
+}
