@@ -7,9 +7,9 @@ import (
 	"net"
 	"os"
 
+	"github.com/castaneai/grpc.castaneai.dev/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"grpc.castaneai.dev/proto"
 )
 
 func main() {
@@ -49,5 +49,4 @@ func (s server) StreamingEcho(stream proto.EchoService_StreamingEchoServer) erro
 			return err
 		}
 	}
-
 }

@@ -1,4 +1,4 @@
-module grpc.castaneai.dev
+module github.com/castaneai/grpc.castaneai.dev
 
 go 1.17
 

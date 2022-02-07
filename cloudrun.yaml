@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: grpc-castaneai-dev
+spec:
+  template:
+    spec:
+      containers:
+          image: ko://github.com/castaneai/grpc.castaneai.dev
+          ports:
+            - name: h2c
+              containerPort: 8080
