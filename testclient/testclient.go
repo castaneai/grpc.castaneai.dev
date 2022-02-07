@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -16,15 +17,16 @@ import (
 )
 
 func usage() {
-	log.Printf("Usage: ./testclient <host:port>")
+	log.Printf("Usage: ./testclient <host:port> <num_stream>")
 	os.Exit(2)
 }
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) != 3 {
 		usage()
 	}
 	addr := os.Args[1]
+	numStream, err := strconv.Atoi(os.Args[2])
 
 	creds, err := loadCredentials()
 	if err != nil {
@@ -38,7 +40,14 @@ func main() {
 	echo := proto.NewEchoServiceClient(cc)
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
-	stream, err := echo.StreamingEcho(ctx)
+	for i := 1; i <= numStream; i++ {
+		go startStream(ctx, echo, fmt.Sprintf("stream%03d", i))
+	}
+	<-ctx.Done()
+}
+
+func startStream(ctx context.Context, c proto.EchoServiceClient, streamID string) {
+	stream, err := c.StreamingEcho(ctx)
 	if err != nil {
 		log.Fatalf("failed to call echo: %+v", err)
 	}
@@ -56,17 +65,19 @@ func main() {
 			}
 		}
 	}()
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(2 * time.Second)
+	i := 0
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			msg := fmt.Sprintf("%v", time.Now())
+			msg := fmt.Sprintf("%s-%d", streamID, i)
 			if err := stream.Send(&proto.StreamingEchoRequest{Message: msg}); err != nil {
 				log.Fatalf("failed to send message: %+v", err)
 			}
 			log.Printf("sent: %s", msg)
+			i++
 		}
 	}
 }
