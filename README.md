@@ -11,7 +11,8 @@
 # via grpcurl
 grpcurl -d '{"message": "hello"}' grpc.castaneai.dev:443 EchoService/StreamingEcho
 
-# A testclient creates multiple streams with EchoService/StreamingEcho
+# A testclient creates 3 streams with EchoService/StreamingEcho.
+# (Press Ctrl-C to stop.)
 go run testclient/testclient.go grpc.castaneai.dev:443 3
 ```
 
